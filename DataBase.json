@@ -1,0 +1,56 @@
+[
+    {
+        "name": "Song Vansak",
+        "id": "700099999",
+        "sem": "6",
+        "year": "2027",
+        "groups": [
+            "1E4",
+            "1E2",
+            "1E2",
+            "1E2"
+        ],
+        "units": [
+            "Writing and Research Skills",
+            "Programming",
+            "Physics 1",
+            "Mathematics 2"
+        ]
+    },
+    {
+        "name": "Song Vansith",
+        "id": "700088888",
+        "sem": "1",
+        "year": "2029",
+        "groups": [
+            "1E4",
+            "1E4",
+            "1E4",
+            "1E4"
+        ],
+        "units": [
+            "Programming",
+            "Physics 1",
+            "Mathematics 2",
+            "Writing and Research Skills"
+        ]
+    },
+    {
+        "name": "Say Puthi",
+        "id": "700077777",
+        "sem": "7",
+        "year": "2030",
+        "groups": [
+            "1E2",
+            "1E4",
+            "1E4",
+            "1E2"
+        ],
+        "units": [
+            "Mathematics 2",
+            "Programming",
+            "Physics 1",
+            "Writing and Research Skills"
+        ]
+    }
+]
