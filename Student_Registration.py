@@ -32,6 +32,10 @@ if not os.path.exists("DataBase.json"):
     with open("DataBase.json", "w") as file:
         json.dump([], file)
 
+# ------------ update database ------------
+def database(student):
+    pass
+
 # ------------ student class ------------
 class Student:
     def __init__(self, name, id, sem, year):
@@ -351,9 +355,7 @@ def mainPage(student):
         
         print(f"{BOLD}{PURPLE}>> Group Registration Main Page <<\n{RESET}")
         OptDis(options, selected, error_msg)
-    
-        # keyboard input
-        # key = get_key()
+
         key = readchar.readkey()
         
         if key == 's':
@@ -492,8 +494,9 @@ def RecordPage(student):
     while True:
         clear_screen()
         options = [
-            "  Print My Grouping Record",
-            "  Exit to Main Page"
+            "Print My Grouping Record",
+            "Modify Registration Record",
+            "Exit to Main Page"
         ]
         print(f"{BOLD}{PURPLE}>> Welcome to Grouping Record <<\n{RESET}")
         print("Here are your Registered Groupings: ")
@@ -509,21 +512,48 @@ def RecordPage(student):
         print(f"{BOLD}" + "=" * 37 + f"{RESET}\n")
         OptDis(options, selected)
         
-        key =readchar.readkey()
+        key = readchar.readkey()
         
         if key == 'w':
             selected -= 1
             if selected < 0:
-                selected = 1
+                selected = 2
         if key == 's':
             selected += 1
-            if selected > 1:
+            if selected > 2:
                 selected = 0
         if key == '\n' or key == '\r':
+            ModRec(student)
             break
             
     return selected
+
+# ------------ modify record ------------
+def ModRec(student):
+    WIDTH = 35
+    selected = 0
+
+    table = []
+    for unit, group in zip(student.units, student.groups):
+        table.append(f"{unit:<{WIDTH}}{group}")
+    table.append("Exit")
     
+    while True:
+        print(f"{BOLD}{RED}>> Modification Record Page <<{RESET}")
+        
+
+        key = readchar.readkey()
+
+        if key == 'w':
+            selected -= 1
+            if selected < 0:
+                selected = len(table) - 1
+
+        if key == 's':
+            selected += 1
+            if selected > len(table) - 1:
+                selected = 0
+
 # ------------ main execution part ------------
 running = True
 
@@ -563,6 +593,8 @@ if __name__ == '__main__':
                     if opt == 0:
                         barLoading()
                     elif opt == 1:
+                        ModRec(student)
+                    elif opt == 2:
                         loading("Returning to Main Page: ")
                         break
             elif opt == 2:
