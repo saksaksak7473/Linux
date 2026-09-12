@@ -5,16 +5,16 @@
         "sem": "6",
         "year": "2027",
         "groups": [
-            "1E4",
-            "1E2",
-            "1E2",
-            "1E2"
+            "1E3",
+            "1E3",
+            "1E3",
+            "1E3"
         ],
         "units": [
-            "Writing and Research Skills",
             "Programming",
             "Physics 1",
-            "Mathematics 2"
+            "Mathematics 2",
+            "Writing and Research Skills"
         ]
     },
     {
@@ -51,6 +51,24 @@
             "Programming",
             "Physics 1",
             "Writing and Research Skills"
+        ]
+    },
+    {
+        "name": "Yat Kimsong",
+        "id": "700055555",
+        "sem": "1",
+        "year": "2025",
+        "groups": [
+            "1E2",
+            "1E4",
+            "1E2",
+            "1E2"
+        ],
+        "units": [
+            "Writing and Research Skills",
+            "Physics 1",
+            "Mathematics 2",
+            "Programming"
         ]
     }
 ]

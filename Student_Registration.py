@@ -312,8 +312,6 @@ def auth():
                         
                 error_msg = f"{BOLD}{RED}Invalid Name or ID!{RESET}"
                 break
-                    
-
 
 # ------------ options display ------------
 def OptDis(options, selected, error_msg = None, student = None):
@@ -523,24 +521,23 @@ def RecordPage(student):
             if selected > 2:
                 selected = 0
         if key == '\n' or key == '\r':
-            ModRec(student)
             break
             
     return selected
 
 # ------------ modify record ------------
 def ModRec(student):
-    WIDTH = 35
+    WIDTH = 30
     selected = 0
-
-    table = []
-    for unit, group in zip(student.units, student.groups):
-        table.append(f"{unit:<{WIDTH}}{group}")
-    table.append("Exit")
-    
     while True:
+        table = []
+        for unit, group in zip(student.units, student.groups):
+            table.append(f"{unit:<{WIDTH}}{group}")
+        table.append("Exit")
         clear_screen()
         print(f"{BOLD}{RED}>> Modification Record Page <<{RESET}")
+        print(f"{BOLD}{UNDERLINE}" + " " * 37 + f"{RESET}\n")
+        print(f"{BOLD}{f'UNITS':<{WIDTH - 1}}GROUPING{RESET}")
         OptDis(table, selected)
 
         key = readchar.readkey()
@@ -554,6 +551,31 @@ def ModRec(student):
             selected += 1
             if selected > len(table) - 1:
                 selected = 0
+
+        if key == '\r' or key == '\n':
+            if selected == len(table) - 1: break
+            else:
+                student.units.remove(student.units[selected])
+                student.groups.remove(student.groups[selected])
+                student.status[selected] = False
+
+                with open("DataBase.json", "r") as file:
+                    students = json.load(file)
+                for c_student in students:
+                    if c_student["name"] == student.name and c_student["id"] == student.id:
+                        c_student["units"].remove(c_student["units"][selected])
+                        c_student["groups"].remove(c_student["groups"][selected])
+                        break
+
+                with open("DataBase.json", "w") as file:
+                    json.dump(students, file, indent = 4)
+
+            selected = 0
+
+        if not student.units:
+            loading("Returning to Main Page: ")
+            break
+
 
 # ------------ main execution part ------------
 running = True
@@ -594,7 +616,9 @@ if __name__ == '__main__':
                     if opt == 0:
                         barLoading()
                     elif opt == 1:
+                        loading("Loadong Modification Page: ")
                         ModRec(student)
+                        break
                     elif opt == 2:
                         loading("Returning to Main Page: ")
                         break
