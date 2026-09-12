@@ -6,15 +6,15 @@
         "year": "2027",
         "groups": [
             "1E1",
-            "1E4",
             "1E3",
-            "1E2"
+            "1E2",
+            "1E4"
         ],
         "units": [
             "Mathematics 2",
-            "Programming",
             "Physics 1",
-            "Writing and Research Skills"
+            "Writing and Research Skills",
+            "Programming"
         ]
     },
     {
@@ -69,6 +69,24 @@
             "Physics 1",
             "Mathematics 2",
             "Programming"
+        ]
+    },
+    {
+        "name": "Lor Hengleap",
+        "id": "700066666",
+        "sem": "5",
+        "year": "2026",
+        "groups": [
+            "1E2",
+            "1E2",
+            "1E2",
+            "1E2"
+        ],
+        "units": [
+            "Programming",
+            "Physics 1",
+            "Mathematics 2",
+            "Writing and Research Skills"
         ]
     }
 ]

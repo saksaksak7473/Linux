@@ -31,11 +31,7 @@ RESET = "\033[0m"
 if not os.path.exists("DataBase.json"):
     with open("DataBase.json", "w") as file:
         json.dump([], file)
-
-# ------------ update database ------------
-def database(student):
-    pass
-
+        
 # ------------ student class ------------
 class Student:
     def __init__(self, name, id, sem, year):
