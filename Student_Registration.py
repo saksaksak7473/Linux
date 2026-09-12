@@ -539,8 +539,9 @@ def ModRec(student):
     table.append("Exit")
     
     while True:
+        clear_screen()
         print(f"{BOLD}{RED}>> Modification Record Page <<{RESET}")
-        
+        OptDis(table, selected)
 
         key = readchar.readkey()
 
