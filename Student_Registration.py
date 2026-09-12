@@ -490,6 +490,7 @@ def RecordPage(student):
     selected = 0
     WIDTH = 20
     while True:
+        if not student.units: return 2
         clear_screen()
         options = [
             "Print My Grouping Record",
@@ -573,9 +574,7 @@ def ModRec(student):
             selected = 0
 
         if not student.units:
-            loading("Returning to Main Page: ")
             break
-
 
 # ------------ main execution part ------------
 running = True
@@ -618,7 +617,6 @@ if __name__ == '__main__':
                     elif opt == 1:
                         loading("Loadong Modification Page: ")
                         ModRec(student)
-                        break
                     elif opt == 2:
                         loading("Returning to Main Page: ")
                         break

@@ -5,15 +5,15 @@
         "sem": "6",
         "year": "2027",
         "groups": [
+            "1E1",
+            "1E4",
             "1E3",
-            "1E3",
-            "1E3",
-            "1E3"
+            "1E2"
         ],
         "units": [
+            "Mathematics 2",
             "Programming",
             "Physics 1",
-            "Mathematics 2",
             "Writing and Research Skills"
         ]
     },
