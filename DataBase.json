@@ -25,13 +25,13 @@
         "groups": [
             "1E4",
             "1E4",
-            "1E4",
-            "1E4"
+            "1E2",
+            "1E2"
         ],
         "units": [
             "Programming",
-            "Physics 1",
             "Mathematics 2",
+            "Physics 1",
             "Writing and Research Skills"
         ]
     },

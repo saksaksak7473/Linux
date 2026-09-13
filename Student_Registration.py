@@ -416,7 +416,7 @@ def UnitPage(temp_g, student):
             "Mathematics 2",
             "Writing and Research Skills",
             "All the Units Above",
-            "Show Other Students",
+            f"Student List for Group {temp_g}",
             "Go Back"
         ]
         print(f"{BOLD}{PURPLE}>> Units Selection Page <<\n{RESET}")
