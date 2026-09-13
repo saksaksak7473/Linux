@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 import time
 import random
@@ -39,10 +37,22 @@ class Student:
         self.__id = id
         self.__sem = sem
         self.__year = year
+
+        self.unit_list = [ # add more units here
+            "Programming",
+            "Physics 1",
+            "Mathematics 2",
+            "Writing and Research Skills",
+            "Critical Thinking",
+            "Reading",
+            "Listening",
+            "Public Speaking",
+            "Cyber Security"
+        ]
         
         self.groups = []
         self.units = []
-        self.status = [False for _ in range(4)]
+        self.status = [False for _ in range(len(self.unit_list))]
         self.Add_Student()
         
     @property
@@ -226,11 +236,11 @@ def auth():
             if key == 'w':
                 selected -= 1
                 if selected < 0:
-                    selected = 2
+                    selected = len(options) - 1
 
             if key == 's':
                 selected += 1
-                if selected > 2:
+                if selected > len(options) - 1:
                     selected = 0
 
             if key == '\n' or key == '\r':
@@ -310,7 +320,7 @@ def auth():
                 break
 
 # ------------ options display ------------
-def OptDis(options, selected, error_msg = None, student = None):
+def OptDis(options, selected, error_msg = None, student = None, other_options = None):
     WIDTH = 35
     colors = [
         "\033[32m",
@@ -320,8 +330,8 @@ def OptDis(options, selected, error_msg = None, student = None):
         for i in range(len(options)):
             if options[i] in student.units:
                 options[i] = f"{GREY}{options[i]:<{WIDTH}}{RESET}"
-        if student.units:
-            options[4] = f"{GREY}{options[4]:<{WIDTH}}{RESET}"
+        if student.units and other_options:
+            options[len(options) - len(other_options) + 1] = f"{GREY}{options[len(options) - len(other_options) + 1]:<{WIDTH}}{RESET}"
                 
     highlighted = f"{CYAN}{BOLD}{colors[0]} {options[selected]:<{WIDTH}}<{RESET}" if selected != len(options) - 1 else f"{CYAN}{BOLD}{colors[1]} {options[selected]:<{WIDTH}}<{RESET}"
     options[selected] = highlighted
@@ -354,12 +364,12 @@ def mainPage(student):
         
         if key == 's':
             selected += 1
-            if selected > 3:
+            if selected > len(options) - 1:
                 selected = 0  
         elif key == 'w':
             selected -= 1
             if selected < 0:
-                selected = 3
+                selected = len(options) - 1
         elif key == '\r' or key == '\n':
             if len(student.units) == 0 and selected == 1:
                 error_msg = f"{BOLD}{RED}You Have Not Registered Using Menu 1 Above!!{RESET}"
@@ -391,10 +401,10 @@ def GroupPage(student):
         if key == 'w':
             selected -= 1
             if selected < 0:
-                selected = 4
+                selected = len(options) - 1
         if key == 's':
             selected += 1
-            if selected > 4:
+            if selected > len(options) - 1:
                 selected = 0
         if key == '\n' or key == '\r':
             temp_g = options[selected].strip()
@@ -411,30 +421,37 @@ def UnitPage(temp_g, student):
         isValid = False
         clear_screen()
         options = [
-            "Programming",
-            "Physics 1",
-            "Mathematics 2",
-            "Writing and Research Skills",
+            unit for unit in student.unit_list
+        ]
+        other_options = [
+            "",
             "All the Units Above",
             f"Student List for Group {temp_g}",
             "Go Back"
         ]
+        for opt in other_options:
+            options.append(opt)
+        
         print(f"{BOLD}{PURPLE}>> Units Selection Page <<\n{RESET}")
         print(f"Please Select the Following Units for Group {BOLD}{CYAN}{temp_g}{RESET}:")
-        OptDis(options.copy(), selected, error_msg, student)
+        OptDis(options.copy(), selected, error_msg, student, other_options)
         
         key = readchar.readkey()
         
         if key == 'w':
             selected -= 1
             if selected < 0:
-                selected = 6
+                selected = len(options) - 1
+            elif selected == len(options) - len(other_options):
+                selected -= 1
         if key == 's':
             selected += 1
-            if selected > 6:
+            if selected > len(options) - 1:
                 selected = 0
+            elif selected == len(options) - len(other_options):
+                selected += 1
         if key == '\n' or key == '\r':
-            if selected < 4:
+            if selected < len(options) - len(other_options):
                 for group, unit in zip(student.groups, student.units):
                     if options[selected] == unit:
                         error_msg = f"\n{RED}{BOLD}You have Previously Registered for unit {unit} for {group}!{RESET}"
@@ -454,7 +471,7 @@ def UnitPage(temp_g, student):
                     with open("DataBase.json", "w") as file:
                         json.dump(students, file, indent = 4)
 
-            elif selected == 5:
+            elif selected == len(options) - 2:
                 while True:
                     isFound = False
                     with open("DataBase.json", "r") as file:
@@ -494,7 +511,7 @@ def UnitPage(temp_g, student):
 
                     if key in ('\r', '\n'): break
                                 
-            elif selected == 6:
+            elif selected == len(options) - 1:
                 break
             else:
                 if student.units:
@@ -502,7 +519,7 @@ def UnitPage(temp_g, student):
                 else:
                     error_msg = None
                     isValid = True
-                    for i in range(len(options) - 2):
+                    for i in range(len(options) - len(other_options)):
                         student.register(temp_g, options[i])
                     student.status = [True for _ in range(4)]
 
@@ -553,10 +570,10 @@ def RecordPage(student):
         if key == 'w':
             selected -= 1
             if selected < 0:
-                selected = 2
+                selected = len(options) - 1
         if key == 's':
             selected += 1
-            if selected > 2:
+            if selected > len(options) - 1:
                 selected = 0
         if key == '\n' or key == '\r':
             break
