@@ -416,6 +416,7 @@ def UnitPage(temp_g, student):
             "Mathematics 2",
             "Writing and Research Skills",
             "All the Units Above",
+            "Show Other Students",
             "Go Back"
         ]
         print(f"{BOLD}{PURPLE}>> Units Selection Page <<\n{RESET}")
@@ -427,10 +428,10 @@ def UnitPage(temp_g, student):
         if key == 'w':
             selected -= 1
             if selected < 0:
-                selected = 5
+                selected = 6
         if key == 's':
             selected += 1
-            if selected > 5:
+            if selected > 6:
                 selected = 0
         if key == '\n' or key == '\r':
             if selected < 4:
@@ -454,6 +455,46 @@ def UnitPage(temp_g, student):
                         json.dump(students, file, indent = 4)
 
             elif selected == 5:
+                while True:
+                    isFound = False
+                    with open("DataBase.json", "r") as file:
+                        students = json.load(file)
+
+                    for c_student in students:
+                        for group in c_student["groups"]:
+                            if group == temp_g:
+                                isFound = True
+                                break
+                        if isFound: break
+                    if not isFound: 
+                        error_msg = error_msg = f"{BOLD}{RED}No Student Registered in This Group Yet!!{RESET}"
+                        break
+
+                    clear_screen()
+                    print(f"{BOLD}{BLUE}Here are the Students in group {temp_g}:{RESET}\n")
+                    print(f"{UNDERLINE}" + " " * 37 + f"{RESET}\n")
+
+                    for c_student in students:
+                        for group in c_student["groups"]:
+                            if group == temp_g:
+                                error_msg = None
+                                isFound = True
+                                if student.name == c_student["name"]: print(f"+ Name: {GREEN}{BOLD}{c_student["name"]} (YOU){RESET} Registered: ")
+                                else: print(f"+ Name: {BOLD}{CYAN}{c_student["name"]}{RESET} Registered: ")
+                                for g, unit in zip(c_student["groups"], c_student["units"]):
+                                    if g == temp_g:
+                                        print(f" - {unit}")
+
+                                print()
+                                break
+
+                    print(f"{UNDERLINE}" + " " * 37 + f"{RESET}\n")
+                    print(f"{DIM_GREY}Press 'Enter' to Continue: {RESET}")
+                    key = readchar.readkey()
+
+                    if key in ('\r', '\n'): break
+                                
+            elif selected == 6:
                 break
             else:
                 if student.units:

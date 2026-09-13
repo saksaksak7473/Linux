@@ -5,16 +5,16 @@
         "sem": "6",
         "year": "2027",
         "groups": [
-            "1E1",
             "1E3",
-            "1E2",
-            "1E4"
+            "1E4",
+            "1E4",
+            "1E3"
         ],
         "units": [
-            "Mathematics 2",
             "Physics 1",
+            "Programming",
             "Writing and Research Skills",
-            "Programming"
+            "Mathematics 2"
         ]
     },
     {
@@ -86,6 +86,20 @@
             "Programming",
             "Physics 1",
             "Mathematics 2",
+            "Writing and Research Skills"
+        ]
+    },
+    {
+        "name": "Chue Yuie",
+        "id": "700044444",
+        "sem": "1",
+        "year": "2030",
+        "groups": [
+            "1E2",
+            "1E2"
+        ],
+        "units": [
+            "Physics 1",
             "Writing and Research Skills"
         ]
     }
