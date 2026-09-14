@@ -318,22 +318,26 @@ def auth():
                 break
 
 # ------------ options display ------------
-def OptDis(options, selected, error_msg = None, student = None, other_options = None):
+def OptDis(options, selected, error_msg = None, student = None, other_options = None, del_list = None):
     WIDTH = 35
     colors = [
         "\033[32m",
         "\033[31m"
     ]
     if student is not None:
+        if len(student.units) == len(student.unit_list) and other_options is not None:
+            options[len(options) - len(other_options) + 1] = f"{GREY}{options[len(options) - len(other_options) + 1]:<{WIDTH}}{RESET}"
         for i in range(len(options)):
             if options[i] in student.units:
                 options[i] = f"{GREY}{options[i]:<{WIDTH}}{RESET}"
-        if student.units and other_options:
-            options[len(options) - len(other_options) + 1] = f"{GREY}{options[len(options) - len(other_options) + 1]:<{WIDTH}}{RESET}"
-                
+        if del_list is not None:
+            for i, unit in enumerate(student.units):
+                if unit in del_list:
+                    options[i] = f"{GREY}{options[i]:<{WIDTH}}{RESET}"
+                    
     highlighted = f"{CYAN}{BOLD}{colors[0]} {options[selected]:<{WIDTH}}<{RESET}" if selected != len(options) - 1 else f"{CYAN}{BOLD}{colors[1]} {options[selected]:<{WIDTH}}<{RESET}"
     options[selected] = highlighted
-    
+
     print(f"{UNDERLINE}" + " " * 37 + f"\n{RESET}")
     for i in range(len(options)):
         print(options[i])
@@ -423,7 +427,7 @@ def UnitPage(temp_g, student):
         ]
         other_options = [
             "",
-            "All the Units Above",
+            "All / Remaining Units Above",
             f"Student List for Group {temp_g}",
             "Go Back"
         ]
@@ -449,6 +453,7 @@ def UnitPage(temp_g, student):
             elif selected == len(options) - len(other_options):
                 selected += 1
         if key == '\n' or key == '\r':
+            # Options for selecting individual unit
             if selected < len(options) - len(other_options):
                 for group, unit in zip(student.groups, student.units):
                     if options[selected] == unit:
@@ -468,7 +473,7 @@ def UnitPage(temp_g, student):
 
                     with open("DataBase.json", "w") as file:
                         json.dump(students, file, indent = 4)
-
+            # Option for display student list
             elif selected == len(options) - 2:
                 while True:
                     isFound = False
@@ -508,29 +513,34 @@ def UnitPage(temp_g, student):
                     key = readchar.readkey()
 
                     if key in ('\r', '\n'): break
-                                
+            # Option for exit the page     
             elif selected == len(options) - 1:
                 break
+            # option for selecting all the unit
             else:
-                if student.units:
-                    error_msg = f"\n{RED}{BOLD}You have Previously Registered for Individual Unit(s)!{RESET}"
-                else:
-                    error_msg = None
-                    isValid = True
-                    for i in range(len(options) - len(other_options)):
-                        student.register(temp_g, options[i])
-                    student.status = [True for _ in range(4)]
+                if len(student.unit_list) == len(student.units):
+                    isValid = False
+                    error_msg = f"\n{RED}{BOLD}No Unit is Left To Register!{RESET}"
 
-                    with open("DataBase.json", "r") as file:
-                        students = json.load(file)
-                        for c_student in students:
-                            if student.name == c_student["name"] and student.id == c_student["id"]:
-                                c_student["groups"] = student.groups
-                                c_student["units"] = student.units
-                                break
+                for unit in student.unit_list:
+                    if unit not in student.units:
+                        isValid = True
+                        error_msg = None
+                        student.register(temp_g, unit)
+                        for i in range(len(student.status)):
+                            student.status[i] = True
 
-                    with open("DataBase.json", "w") as file:
-                        json.dump(students, file, indent = 4)
+                with open("DataBase.json", "r") as file:
+                    students = json.load(file)
+                    for c_student in students:
+                        if student.name == c_student["name"] and student.id == c_student["id"]:
+                            c_student["groups"] = student.groups
+                            c_student["units"] = student.units
+                            break
+
+                with open("DataBase.json", "w") as file:
+                    json.dump(students, file, indent = 4)
+
         if isValid:
             group = f"  - Group: {BOLD}{BLUE}{temp_g}{RESET}"
             unit = f"  - Unit: {BOLD}{BLUE}{options[selected]}{RESET}"
@@ -582,16 +592,27 @@ def RecordPage(student):
 def ModRec(student):
     WIDTH = 30
     selected = 0
+    error_msg = None
+    other_options = [
+        "",
+        "Multiple Select",
+        "Exit"
+    ]
+    multi_del = False
+    del_list = []
     while True:
         table = []
         for unit, group in zip(student.units, student.groups):
             table.append(f"{unit:<{WIDTH}}{group}")
-        table.append("Exit")
+
+        for option in other_options:
+            table.append(option)
+
         clear_screen()
         print(f"{BOLD}{RED}>> Modification Record Page <<{RESET}")
         print(f"{BOLD}{UNDERLINE}" + " " * 37 + f"{RESET}\n")
         print(f"{BOLD}{f'UNITS':<{WIDTH - 1}}GROUPING{RESET}")
-        OptDis(table, selected)
+        OptDis(table, selected, error_msg, student, None, del_list)
 
         key = readchar.readkey()
 
@@ -599,31 +620,75 @@ def ModRec(student):
             selected -= 1
             if selected < 0:
                 selected = len(table) - 1
+            elif selected == len(table) - len(other_options):
+                selected -= 1
 
         if key == 's':
             selected += 1
             if selected > len(table) - 1:
                 selected = 0
+            elif selected == len(table) - len(other_options):
+                selected += 1
 
         if key == '\r' or key == '\n':
+            with open("DataBase.json", "r") as file:
+                students = json.load(file)
+
+            # Exit
             if selected == len(table) - 1: break
+
+            # Multiple Delete
+            elif selected == len(table) - 2: 
+                if other_options[1] == "Multiple Select":
+                    other_options[1] = "Confirm"
+                    multi_del = True
+                    error_msg = None
+                    selected = 0
+                else:
+                    if not del_list:
+                        error_msg = f"{BOLD}{RED}Nothing is Selected!!{RESET}"
+                    other_options[1] = "Multiple Select"
+                    multi_del = False
+                    for c_student in students:
+                        if c_student["name"] == student.name and c_student["id"] == student.id:
+                            for unit, group in zip(student.units, student.groups):
+                                if unit in del_list:
+                                    c_student["units"].remove(unit)
+                                    c_student["groups"].remove(group)
+
+                    units, groups = student.units.copy(), student.groups.copy()
+                    for i, (unit, group) in enumerate(zip(units, groups)):
+                        if unit in del_list:
+                            student.units.remove(unit)
+                            student.groups.remove(group)
+                            student.status[i] = False
+
+                    del_list = []
+
+            # Individual Delete
             else:
-                student.units.remove(student.units[selected])
-                student.groups.remove(student.groups[selected])
-                student.status[selected] = False
+                if multi_del:
+                    if student.units[selected] not in del_list:
+                        error_msg = None
+                        del_list.append(student.units[selected])
+                    else:
+                        error_msg = f"{RED}{BOLD}Already Selected!!{RESET}"
+                else:
+                    student.units.remove(student.units[selected])
+                    student.groups.remove(student.groups[selected])
+                    student.status[selected] = False
 
-                with open("DataBase.json", "r") as file:
-                    students = json.load(file)
-                for c_student in students:
-                    if c_student["name"] == student.name and c_student["id"] == student.id:
-                        c_student["units"].remove(c_student["units"][selected])
-                        c_student["groups"].remove(c_student["groups"][selected])
-                        break
+                    for c_student in students:
+                        if c_student["name"] == student.name and c_student["id"] == student.id:
+                            c_student["units"].remove(c_student["units"][selected])
+                            c_student["groups"].remove(c_student["groups"][selected])
+                            break
 
-                with open("DataBase.json", "w") as file:
-                    json.dump(students, file, indent = 4)
+                    selected = 0    
 
-            selected = 0
+            with open("DataBase.json", "w") as file:
+                json.dump(students, file, indent = 4)
+
 
         if not student.units:
             break

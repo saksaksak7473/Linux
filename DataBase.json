@@ -8,23 +8,23 @@
             "1E2",
             "1E2",
             "1E2",
-            "1E2",
-            "1E2",
-            "1E1",
-            "1E1",
+            "1E4",
+            "1E4",
+            "1E3",
+            "1E3",
             "1E1",
             "1E1"
         ],
         "units": [
             "Programming",
+            "Public Speaking",
+            "Cyber Security",
+            "Reading",
+            "Critical Thinking",
+            "Physics 1",
             "Mathematics 2",
             "Writing and Research Skills",
-            "Physics 1",
-            "Critical Thinking",
-            "Reading",
-            "Listening",
-            "Public Speaking",
-            "Cyber Security"
+            "Listening"
         ]
     },
     {
