@@ -4,11 +4,11 @@ import random
 import json
 import readchar
 
-# ------------ ANSI Escape Sequences ------------
+# ------------ clear screen ------------
 def clear_screen():
     os.system("clear")
 
-# ------------ colors ------------:
+# ------------ colors ------------
 RED = "\033[31m"
 GREEN = "\033[32m"
 YELLOW = "\033[33m"
@@ -99,9 +99,7 @@ class Student:
         with open("DataBase.json", "w") as file:
             json.dump(students, file, indent = 4)
 
-
 # ------------ checker ------------:
-
 def get_name(prompt: str, error_msg: str, strings = None, isLogin = None):
     while True:
         string = error_msg
@@ -164,7 +162,7 @@ def get_int(prompt: str, error_msg: str, start: int, end: int, strings = None):
     while True:
         num = input(prompt).strip()
         if num.isdigit() and int(num) >= start and int(num) <= end:
-            return num.strip("0")
+            return num.lstrip("0")
         else: 
             clear_screen()
             if strings is not None: display(strings)

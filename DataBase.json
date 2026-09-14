@@ -141,22 +141,50 @@
             "1E1",
             "1E1",
             "1E1",
-            "1E1",
-            "1E1",
-            "1E1",
-            "1E1",
-            "1E1"
+            "1E3",
+            "1E3",
+            "1E3",
+            "1E3",
+            "1E3"
         ],
         "units": [
             "Programming",
+            "Writing and Research Skills",
+            "Public Speaking",
+            "Cyber Security",
             "Physics 1",
             "Mathematics 2",
-            "Writing and Research Skills",
             "Critical Thinking",
             "Reading",
-            "Listening",
+            "Listening"
+        ]
+    },
+    {
+        "name": "Emma Veil",
+        "id": "700011111",
+        "sem": "1",
+        "year": "2030",
+        "groups": [
+            "1E1",
+            "1E1",
+            "1E3",
+            "1E3",
+            "1E3",
+            "1E4",
+            "1E4",
+            "1E4",
+            "1E4"
+        ],
+        "units": [
+            "Cyber Security",
             "Public Speaking",
-            "Cyber Security"
+            "Critical Thinking",
+            "Writing and Research Skills",
+            "Mathematics 2",
+            "Listening",
+            "Reading",
+            "Physics 1",
+            "Programming"
         ]
     }
 ]
