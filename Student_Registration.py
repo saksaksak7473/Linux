@@ -561,7 +561,6 @@ def UnitPage(temp_g, student):
 
                     with open("DataBase.json", "w") as file:
                         json.dump(students, file, indent = 4)
-
                     
             # Option for display student list
             elif selected == len(options) - 2:
@@ -575,6 +574,7 @@ def UnitPage(temp_g, student):
                     other_options[1], other_options[4] = "Multiple Units Selection", "Go Back"
                     error_msg = None
                     multi_sel = False
+                    sel_list = []
 
             # option for selecting all the unit
             else:
@@ -651,13 +651,13 @@ def ModRec(student):
     WIDTH = 30
     selected = 0
     error_msg = None
-    other_options = [
-        "",
-        "Multiple Select",
-        "Exit"
-    ]
     multi_del = False
     del_list = []
+    other_options = [
+        "",
+        "Multiple Delete",
+        "Go Back"
+    ]
     while True:
         table = []
         for unit, group in zip(student.units, student.groups):
@@ -693,19 +693,28 @@ def ModRec(student):
                 students = json.load(file)
 
             # Exit
-            if selected == len(table) - 1: break
+            if selected == len(table) - 1:
+                if multi_del:
+                    other_options[1], other_options[2] = "Multiple Delete", "Go Back"
+                    multi_del = False
+                    error_msg = None
+                    del_list = []
+                else:
+                    break
 
             # Multiple Delete
             elif selected == len(table) - 2: 
-                if other_options[1] == "Multiple Select":
-                    other_options[1] = "Confirm"
+                if other_options[1] == "Multiple Delete":
+                    other_options[1], other_options[2] = "Confirm", "Cancel"
                     multi_del = True
-                    error_msg = None
                 else:
+                    other_options[1], other_options[2] = "Multiple Delete", "Go Back"
+                    multi_del = False
+
                     if not del_list:
                         error_msg = f"{BOLD}{RED}Nothing is Selected!!{RESET}"
-                    other_options[1] = "Multiple Select"
-                    multi_del = False
+                    else: error_msg = None
+
                     for c_student in students:
                         if c_student["name"] == student.name and c_student["id"] == student.id:
                             for unit, group in zip(student.units, student.groups):
@@ -720,7 +729,6 @@ def ModRec(student):
                             student.groups.remove(group)
                             student.status[i] = False
 
-                    selected = 0
                     del_list = []
 
             # Individual Delete
@@ -747,7 +755,6 @@ def ModRec(student):
 
             with open("DataBase.json", "w") as file:
                 json.dump(students, file, indent = 4)
-
 
         if not student.units:
             break
