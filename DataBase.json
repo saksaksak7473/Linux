@@ -4,16 +4,8 @@
         "id": "700099999",
         "sem": "6",
         "year": "2027",
-        "groups": [
-            "1E2",
-            "1E2",
-            "1E2"
-        ],
-        "units": [
-            "Public Speaking",
-            "Critical Thinking",
-            "Writing and Research Skills"
-        ]
+        "groups": [],
+        "units": []
     },
     {
         "name": "Song Vansith",

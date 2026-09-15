@@ -730,6 +730,7 @@ def ModRec(student):
                             student.status[i] = False
 
                     del_list = []
+                    selected = 0
 
             # Individual Delete
             else:
