@@ -5,26 +5,14 @@
         "sem": "6",
         "year": "2027",
         "groups": [
-            "1E2",
-            "1E2",
-            "1E2",
-            "1E4",
-            "1E4",
-            "1E3",
-            "1E3",
+            "1E1",
             "1E1",
             "1E1"
         ],
         "units": [
-            "Programming",
             "Public Speaking",
-            "Cyber Security",
-            "Reading",
-            "Critical Thinking",
-            "Physics 1",
-            "Mathematics 2",
-            "Writing and Research Skills",
-            "Listening"
+            "Listening",
+            "Writing and Research Skills"
         ]
     },
     {
@@ -36,13 +24,15 @@
             "1E4",
             "1E4",
             "1E2",
-            "1E2"
+            "1E2",
+            "1E1"
         ],
         "units": [
             "Programming",
             "Mathematics 2",
             "Physics 1",
-            "Writing and Research Skills"
+            "Writing and Research Skills",
+            "Critical Thinking"
         ]
     },
     {

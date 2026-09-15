@@ -318,7 +318,7 @@ def auth():
                 break
 
 # ------------ options display ------------
-def OptDis(options, selected, error_msg = None, student = None, other_options = None, del_list = None):
+def OptDis(options, selected, error_msg = None, student = None, other_options = None, list = None, unit_list = None):
     WIDTH = 35
     colors = [
         "\033[32m",
@@ -326,13 +326,17 @@ def OptDis(options, selected, error_msg = None, student = None, other_options = 
     ]
     if student is not None:
         if len(student.units) == len(student.unit_list) and other_options is not None:
-            options[len(options) - len(other_options) + 1] = f"{GREY}{options[len(options) - len(other_options) + 1]:<{WIDTH}}{RESET}"
+            options[len(options) - len(other_options) + 2] = f"{GREY}{options[len(options) - len(other_options) + 2]:<{WIDTH}}{RESET}"
         for i in range(len(options)):
             if options[i] in student.units:
                 options[i] = f"{GREY}{options[i]:<{WIDTH}}{RESET}"
-        if del_list is not None:
+        if list is not None:
             for i, unit in enumerate(student.units):
-                if unit in del_list:
+                if unit in list:
+                    options[i] = f"{GREY}{options[i]:<{WIDTH}}{RESET}"
+        if unit_list is not None:
+            for i, unit in enumerate(unit_list):
+                if unit in list:
                     options[i] = f"{GREY}{options[i]:<{WIDTH}}{RESET}"
                     
     highlighted = f"{CYAN}{BOLD}{colors[0]} {options[selected]:<{WIDTH}}<{RESET}" if selected != len(options) - 1 else f"{CYAN}{BOLD}{colors[1]} {options[selected]:<{WIDTH}}<{RESET}"
@@ -414,29 +418,75 @@ def GroupPage(student):
         
     return selected, temp_g
 
+# ------------ Group view ------------
+def GroupView(student):
+    error_msg = None
+    while True:
+        isFound = False
+        with open("DataBase.json", "r") as file:
+            students = json.load(file)
+
+        for c_student in students:
+            for group in c_student["groups"]:
+                if group == temp_g:
+                    isFound = True
+                    break
+            if isFound: break
+        if not isFound: 
+            error_msg = error_msg = f"{BOLD}{RED}No Student Registered in This Group Yet!!{RESET}"
+            break
+
+        clear_screen()
+        print(f"{BOLD}{BLUE}Here are the Students in group {temp_g}:{RESET}\n")
+        print(f"{UNDERLINE}" + " " * 37 + f"{RESET}\n")
+
+        for c_student in students:
+            for group in c_student["groups"]:
+                if group == temp_g:
+                    error_msg = None
+                    isFound = True
+                    if student.name == c_student["name"]: print(f"+ Name: {GREEN}{BOLD}{c_student["name"]} (YOU){RESET} Registered: ")
+                    else: print(f"+ Name: {BOLD}{CYAN}{c_student["name"]}{RESET} Registered: ")
+                    for g, unit in zip(c_student["groups"], c_student["units"]):
+                        if g == temp_g:
+                            print(f" - {unit}")
+
+                    print()
+                    break
+
+        print(f"{UNDERLINE}" + " " * 37 + f"{RESET}\n")
+        print(f"{DIM_GREY}Press 'Enter' to Continue: {RESET}")
+        key = readchar.readkey()
+
+        if key in ('\r', '\n'): break
+    return error_msg
+
 # ------------ units page ------------
 def UnitPage(temp_g, student):
     clear_screen()
     selected = 0
     error_msg = None
+    multi_sel = False
+    sel_list = []
+    other_options = [
+        "",
+        "Multiple Units Selection",
+        "All / Remaining Units Above",
+        f"Student List for Group {temp_g}",
+        "Go Back"
+    ]
     while True:
         isValid = False
         clear_screen()
         options = [
             unit for unit in student.unit_list
         ]
-        other_options = [
-            "",
-            "All / Remaining Units Above",
-            f"Student List for Group {temp_g}",
-            "Go Back"
-        ]
         for opt in other_options:
             options.append(opt)
         
         print(f"{BOLD}{PURPLE}>> Units Selection Page <<\n{RESET}")
         print(f"Please Select the Following Units for Group {BOLD}{CYAN}{temp_g}{RESET}:")
-        OptDis(options.copy(), selected, error_msg, student, other_options)
+        OptDis(options.copy(), selected, error_msg, student, other_options, sel_list, student.unit_list)
         
         key = readchar.readkey()
         
@@ -455,67 +505,77 @@ def UnitPage(temp_g, student):
         if key == '\n' or key == '\r':
             # Options for selecting individual unit
             if selected < len(options) - len(other_options):
-                for group, unit in zip(student.groups, student.units):
-                    if options[selected] == unit:
-                        error_msg = f"\n{RED}{BOLD}You have Previously Registered for unit {unit} for {group}!{RESET}"
-                        break
-                if options[selected] not in student.units:
-                    error_msg = None
-                    isValid = True
-                    student.register(temp_g, options[selected])
-                    student.status[selected] = True
+                if multi_sel:
+                    for group, unit in zip(student.groups, student.units):
+                        if options[selected] == unit:
+                            error_msg = f"\n{RED}{BOLD}You have Previously Registered for unit {unit} for {group}!{RESET}"
+                            break
+                    if student.unit_list[selected] not in student.units: sel_list.append(student.unit_list[selected])
+                else:
+                    for group, unit in zip(student.groups, student.units):
+                        if options[selected] == unit:
+                            error_msg = f"\n{RED}{BOLD}You have Previously Registered for unit {unit} for {group}!{RESET}"
+                            break
+                    if options[selected] not in student.units:
+                        error_msg = None
+                        isValid = True
+                        student.register(temp_g, options[selected])
+                        student.status[selected] = True
+                        with open("DataBase.json", "r") as file:
+                            students = json.load(file)
+                            for c_student in students:
+                                if student.name == c_student["name"] and student.id == c_student["id"]:
+                                    c_student["groups"].append(temp_g)
+                                    c_student["units"].append(options[selected])
+
+                        with open("DataBase.json", "w") as file:
+                            json.dump(students, file, indent = 4)
+            # multiple units selection
+            elif selected == len(options) - 4:
+                if other_options[1] == "Multiple Units Selection" :
+                    other_options[1], other_options[4] = "Confirm", "Cancel"
+                    multi_sel = True
+                else: 
+                    other_options[1], other_options[4] = "Multiple Units Selection", "Go Back"
+                    multi_sel = False
+
+                    if not sel_list:
+                        error_msg = f"{BOLD}{RED}You Didn't Register Any Unit!!{RESET}"
+                    else: 
+                        isValid = True
+                        error_msg = None
+
+                    for i, unit in enumerate(student.unit_list):
+                        if unit in sel_list:
+                            student.register(temp_g, unit)
+                            student.status[i] = True
+
                     with open("DataBase.json", "r") as file:
                         students = json.load(file)
+
                         for c_student in students:
-                            if student.name == c_student["name"] and student.id == c_student["id"]:
-                                c_student["groups"].append(temp_g)
-                                c_student["units"].append(options[selected])
+                            if c_student["name"] == student.name and c_student["id"] == student.id:
+                                for unit in sel_list:
+                                    c_student["units"].append(unit)
+                                    c_student["groups"].append(temp_g)
 
                     with open("DataBase.json", "w") as file:
                         json.dump(students, file, indent = 4)
+
+                    
             # Option for display student list
             elif selected == len(options) - 2:
-                while True:
-                    isFound = False
-                    with open("DataBase.json", "r") as file:
-                        students = json.load(file)
+                error_msg = GroupView(student)
 
-                    for c_student in students:
-                        for group in c_student["groups"]:
-                            if group == temp_g:
-                                isFound = True
-                                break
-                        if isFound: break
-                    if not isFound: 
-                        error_msg = error_msg = f"{BOLD}{RED}No Student Registered in This Group Yet!!{RESET}"
-                        break
-
-                    clear_screen()
-                    print(f"{BOLD}{BLUE}Here are the Students in group {temp_g}:{RESET}\n")
-                    print(f"{UNDERLINE}" + " " * 37 + f"{RESET}\n")
-
-                    for c_student in students:
-                        for group in c_student["groups"]:
-                            if group == temp_g:
-                                error_msg = None
-                                isFound = True
-                                if student.name == c_student["name"]: print(f"+ Name: {GREEN}{BOLD}{c_student["name"]} (YOU){RESET} Registered: ")
-                                else: print(f"+ Name: {BOLD}{CYAN}{c_student["name"]}{RESET} Registered: ")
-                                for g, unit in zip(c_student["groups"], c_student["units"]):
-                                    if g == temp_g:
-                                        print(f" - {unit}")
-
-                                print()
-                                break
-
-                    print(f"{UNDERLINE}" + " " * 37 + f"{RESET}\n")
-                    print(f"{DIM_GREY}Press 'Enter' to Continue: {RESET}")
-                    key = readchar.readkey()
-
-                    if key in ('\r', '\n'): break
             # Option for exit the page     
             elif selected == len(options) - 1:
-                break
+                if not multi_sel:
+                    break
+                else:
+                    other_options[1], other_options[4] = "Multiple Units Selection", "Go Back"
+                    error_msg = None
+                    multi_sel = False
+
             # option for selecting all the unit
             else:
                 if len(student.unit_list) == len(student.units):
@@ -525,7 +585,6 @@ def UnitPage(temp_g, student):
                 for unit in student.unit_list:
                     if unit not in student.units:
                         isValid = True
-                        error_msg = None
                         student.register(temp_g, unit)
                         for i in range(len(student.status)):
                             student.status[i] = True
@@ -542,9 +601,8 @@ def UnitPage(temp_g, student):
                     json.dump(students, file, indent = 4)
 
         if isValid:
-            group = f"  - Group: {BOLD}{BLUE}{temp_g}{RESET}"
-            unit = f"  - Unit: {BOLD}{BLUE}{options[selected]}{RESET}"
-            loading(f"> {BOLD}You Have Chosen:{RESET}\n{group}\n{unit}\n\n{BOLD}Loading: ")
+            error_msg = f"{BOLD}{GREEN}Registered!!{RESET}"
+            sel_list = []
 
 # ------------record page ------------
 def RecordPage(student):
@@ -643,7 +701,6 @@ def ModRec(student):
                     other_options[1] = "Confirm"
                     multi_del = True
                     error_msg = None
-                    selected = 0
                 else:
                     if not del_list:
                         error_msg = f"{BOLD}{RED}Nothing is Selected!!{RESET}"
@@ -663,6 +720,7 @@ def ModRec(student):
                             student.groups.remove(group)
                             student.status[i] = False
 
+                    selected = 0
                     del_list = []
 
             # Individual Delete
@@ -674,6 +732,7 @@ def ModRec(student):
                     else:
                         error_msg = f"{RED}{BOLD}Already Selected!!{RESET}"
                 else:
+                    error_msg = None
                     student.units.remove(student.units[selected])
                     student.groups.remove(student.groups[selected])
                     student.status[selected] = False
